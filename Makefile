@@ -12,6 +12,7 @@ build-linux:
 	export LD_LIBRARY_PATH=$(LIB_PATH):$$LD_LIBRARY_PATH && go build -o $(OUTPUT_DIR)/crate-api-data
 	cp $(LIB_PATH)/* $(OUTPUT_DIR)
 	cp .env $(OUTPUT_DIR)/
+	cp script/run-linux.sh $(OUTPUT_DIR)/
 
 # 交叉编译到 Windows
 build-windows:
@@ -20,6 +21,7 @@ build-windows:
 	LD_LIBRARY_PATH=$(LIB_PATH):$$LD_LIBRARY_PATH CGO_LDFLAGS="-L$(LIB_PATH)" go build -o $(OUTPUT_DIR)/crate-api-data.exe
 	cp $(LIB_PATH)/* $(OUTPUT_DIR)
 	cp .env $(OUTPUT_DIR)/
+	cp script/run-windows.cmd $(OUTPUT_DIR)/
 
 # 同时编译 Linux 和 Windows
 build: clean build-linux build-windows
