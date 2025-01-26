@@ -9,6 +9,12 @@ find_program(GO_EXECUTABLE NAMES go REQUIRED)
 # 设置输出目录
 set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/target")
 
+# 设置编译选项
+if (WIN32)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+endif()
+
 # 同步依赖
 add_custom_target(tidy
     COMMAND ${GO_EXECUTABLE} mod tidy
@@ -18,7 +24,7 @@ add_custom_target(tidy
 # 构建项目
 add_custom_target(build-linux
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_DIR}
-    COMMAND ${GO_EXECUTABLE} build -ldflags "-s -w" -trimpath -o ${OUTPUT_DIR}/crate-api-data cmd/main.go
+    COMMAND CGO_ENABLED=1 ${GO_EXECUTABLE} build -ldflags "-s -w" -trimpath -o ${OUTPUT_DIR}/crate-api-data cmd/main.go
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/.env ${OUTPUT_DIR}/
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
@@ -26,7 +32,7 @@ add_custom_target(build-linux
 # 交叉编译到 Windows
 add_custom_target(build-windows
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_DIR}
-    COMMAND GOOS=windows GOARCH=amd64 ${GO_EXECUTABLE} build -ldflags "-s -w" -trimpath -o ${OUTPUT_DIR}/crate-api-data.exe cmd/main.go
+    COMMAND CGO_ENABLED=1 GOOS=windows GOARCH=amd64 ${GO_EXECUTABLE} build -ldflags "-s -w" -trimpath -o ${OUTPUT_DIR}/crate-api-data.exe cmd/main.go
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/.env ${OUTPUT_DIR}/
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
