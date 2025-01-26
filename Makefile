@@ -7,13 +7,13 @@ tidy:
 # 构建项目
 build-linux:
 	mkdir -p $(OUTPUT_DIR)
-	go build -ldflags="-s -w" -trimpath -o $(OUTPUT_DIR)/crate-api-data cmd/main.go
+	go build -ldflags "-s -w" -trimpath -o $(OUTPUT_DIR)/crate-api-data cmd/main.go
 	cp .env $(OUTPUT_DIR)/
 
 # 交叉编译到 Windows
 build-windows:
 	mkdir -p $(OUTPUT_DIR)
-	GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o $(OUTPUT_DIR)/crate-api-data.exe cmd/main.go
+	GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -trimpath -o $(OUTPUT_DIR)/crate-api-data.exe cmd/main.go
 	cp .env $(OUTPUT_DIR)/
 
 # 同时编译 Linux 和 Windows

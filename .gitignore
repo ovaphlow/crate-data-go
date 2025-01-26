@@ -3,3 +3,6 @@ database
 lib
 target
 *.so
+
+# 忽略 CMake 生成的 build 目录
+/build/

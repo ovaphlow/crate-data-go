@@ -18,7 +18,7 @@ add_custom_target(tidy
 # 构建项目
 add_custom_target(build-linux
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_DIR}
-    COMMAND ${GO_EXECUTABLE} build -ldflags="-s -w" -trimpath -o ${OUTPUT_DIR}/crate-api-data cmd/main.go
+    COMMAND ${GO_EXECUTABLE} build -ldflags "-s -w" -trimpath -o ${OUTPUT_DIR}/crate-api-data cmd/main.go
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/.env ${OUTPUT_DIR}/
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
@@ -26,18 +26,17 @@ add_custom_target(build-linux
 # 交叉编译到 Windows
 add_custom_target(build-windows
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_DIR}
-    COMMAND ${GO_EXECUTABLE} build -ldflags="-s -w" -trimpath -o ${OUTPUT_DIR}/crate-api-data.exe cmd/main.go
+    COMMAND GOOS=windows GOARCH=amd64 ${GO_EXECUTABLE} build -ldflags "-s -w" -trimpath -o ${OUTPUT_DIR}/crate-api-data.exe cmd/main.go
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/.env ${OUTPUT_DIR}/
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    ENV GOOS=windows GOARCH=amd64
 )
 
 # 同时编译 Linux 和 Windows
 add_custom_target(build ALL
-    DEPENDS clean build-linux build-windows
+    DEPENDS clean_target build-linux build-windows
 )
 
 # 清理构建文件
-add_custom_target(clean
+add_custom_target(clean_target
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${OUTPUT_DIR}
 )
