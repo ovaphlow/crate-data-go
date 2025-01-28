@@ -1,11 +1,19 @@
 # CRATE DATA
 
-## 脚本
+## 初始化构建目录
 
-同步依赖
+在项目根目录下创建并初始化 `build` 目录：
 
 ```shell
-make tidy
+mkdir -p build
+cd build
+cmake ..
+```
+
+## 同步依赖
+
+```shell
+cmake --build . --target tidy
 ```
 
 ## 构建
@@ -13,45 +21,27 @@ make tidy
 ### 构建 Linux 版本
 
 ```shell
-make build-linux
+cmake --build . --target build-linux
 ```
 
-### 交叉编译到 Windows
+### 交叉编译到 Windows (MySQL)
 
 ```shell
-make build-windows
+cmake --build . --target build-windows-mysql
 ```
 
 ### 同时编译 Linux 和 Windows
 
 ```shell
-make build
+cmake --build . --target build
 ```
 
 ## 清理构建文件
 
 ```shell
-make clean
+cmake --build . --target clean_target
 ```
 
-## 测试
+## 在 Windows 系统上使用 CMake
 
-在工程根目录执行 `utility` 目录的测试
-
-```shell
-make test-utility
-```
-
-## 运行程序
-
-```shell
-make run
-```
-
-## 设置库路径
-
-请确保 `libcrate_shared.so` 文件存放在 `./lib` 目录下。
-
-## 在 Windows 系统上使用 Makefile
-
-在 Windows 系统上使用 Makefile，您需要安装一个兼容的工具，例如 Git Bash 或 Cygwin。安装完成后，您可以在这些终端中运行 `make` 命令。
+在 Windows 系统上使用 CMake，您需要安装一个兼容的工具，例如 Git Bash 或 Cygwin。安装完成后，您可以在这些终端中运行 `cmake` 和 `cmake --build` 命令。
