@@ -144,6 +144,11 @@ func (route *RouteMySQL) getMany(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 		return
 	}
+	if result == nil || len(result) == 0 {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte("[]"))
+		return
+	}
 
 	json.NewEncoder(w).Encode(result)
 }
