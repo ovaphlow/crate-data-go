@@ -28,19 +28,16 @@ add_custom_target(build-linux
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/.env ${OUTPUT_DIR}/
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
+add_dependencies(build-linux clean_target)  # 添加依赖：先执行 clean_target
 
-# 交叉编译到 Windows (MySQL)
-add_custom_target(build-windows-mysql
+# 交叉编译到 Windows
+add_custom_target(build-windows
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_DIR}
-    COMMAND CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ ${GO_EXECUTABLE} build -ldflags "-s -w" -trimpath -o ${OUTPUT_DIR}/crate-api-data-mysql.exe cmd/service-mysql/main.go
+    COMMAND CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ ${GO_EXECUTABLE} build -ldflags "-s -w" -trimpath -o ${OUTPUT_DIR}/crate-api-data.exe cmd/main.go
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/.env ${OUTPUT_DIR}/
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
-
-# 同时编译 Linux 和 Windows
-add_custom_target(build ALL
-    DEPENDS clean_target build-linux build-windows-mysql
-)
+add_dependencies(build-windows clean_target)  # 添加依赖：先执行 clean_target
 
 # 清理构建文件
 add_custom_target(clean_target
