@@ -18,19 +18,19 @@ func LoadSQLiteRouter(mux *http.ServeMux, prefix string, service *service.Applic
 		route.delete(w, r)
 	})
 
-	mux.HandleFunc("PUT "+prefix+"/edb-util/{st}/{id}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("PUT "+prefix+"/sqlite/{st}/{id}", func(w http.ResponseWriter, r *http.Request) {
 		route.put(w, r)
 	})
 
-	mux.HandleFunc("GET "+prefix+"/edb-util/{st}/{id}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET "+prefix+"/sqlite/{st}/{id}", func(w http.ResponseWriter, r *http.Request) {
 		route.get(w, r)
 	})
 
-	mux.HandleFunc("GET "+prefix+"/edb-util/{st}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET "+prefix+"/sqlite/{st}", func(w http.ResponseWriter, r *http.Request) {
 		route.getMany(w, r)
 	})
 
-	mux.HandleFunc("POST "+prefix+"/edb-util/{st}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("POST "+prefix+"/sqlite/{st}", func(w http.ResponseWriter, r *http.Request) {
 		route.post(w, r)
 	})
 }
