@@ -119,7 +119,7 @@ func (s *ApplicationServiceImpl) Update(st string, d map[string]interface{}, w s
 		return fmt.Errorf("缺少ID")
 	}
 
-	existingData, err := s.repo.Get(st, []string{"state"}, [][]string{{"equal", "id", id}}, "")
+	existingData, err := s.repo.Get(st, []string{"data_state"}, [][]string{{"equal", "id", id}}, "")
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func (s *ApplicationServiceImpl) Update(st string, d map[string]interface{}, w s
 	}
 
 	var state map[string]interface{}
-	err = json.Unmarshal([]byte(existingData[0]["state"].(string)), &state)
+	err = json.Unmarshal([]byte(existingData[0]["data_state"].(string)), &state)
 	if err != nil {
 		return err
 	}
@@ -140,7 +140,7 @@ func (s *ApplicationServiceImpl) Update(st string, d map[string]interface{}, w s
 	if err != nil {
 		return err
 	}
-	d["state"] = string(stateJson)
+	d["data_state"] = string(stateJson)
 
 	return s.repo.Update(st, d, w)
 }
