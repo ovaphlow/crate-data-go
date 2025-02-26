@@ -29,7 +29,9 @@ func InitMySQL(user, password, host, port, database string) {
 	MySQL.SetConnMaxLifetime(time.Minute * 3)
 	cpuCount := runtime.NumCPU()
 	MySQL.SetMaxOpenConns(cpuCount*2 + 1)
-	MySQL.SetMaxIdleConns(cpuCount*2 + 1)
+	// MySQL.SetMaxIdleConns(cpuCount*2 + 1)
+	MySQL.SetMaxIdleConns(0)
+	MySQL.SetConnMaxLifetime(time.Second * 30)
 	if err = MySQL.Ping(); err != nil {
 		log.Println("连接数据库失败 MySQL")
 		log.Fatal(err.Error())
