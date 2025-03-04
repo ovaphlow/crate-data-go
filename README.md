@@ -332,8 +332,11 @@ The API includes several security measures | API 包含多项安全措施：
 - API version middleware for version control | 用于版本控制的 API 版本中间件
 
 ## Build Instructions | 构建说明
+You can use either CMake or Meson to build this project.
 
-### Initialize Build Directory | 初始化构建目录
+### Using CMake | 使用 CMake
+
+#### Initialize Build Directory | 初始化构建目录
 
 Create and initialize the `build` directory in the project root:
 
@@ -345,31 +348,55 @@ cd build
 cmake ..
 ```
 
-### Sync Dependencies | 同步依赖
+#### Sync Dependencies | 同步依赖
 
 ```shell
 cmake --build . --target tidy
 ```
 
-### Build Targets | 构建目标
+#### Build Targets | 构建目标
 
-#### Build for Linux | 构建 Linux 版本
+##### Build for Linux | 构建 Linux 版本
 
 ```shell
 cmake --build . --target build-linux
 ```
 
-### Clean Build Files | 清理构建文件
+#### Clean Build Files | 清理构建文件
 
 ```shell
 cmake --build . --target clean_target
 ```
 
-### Using CMake on Windows | 在 Windows 系统上使用 CMake
+### Using Meson | 使用 Meson
+#### Initialize Build Directory | 初始化构建目录
+```shell
+meson setup build
+cd build
+```
 
-To use CMake on Windows, you need to install a compatible tool such as Git Bash or Cygwin. After installation, you can run `cmake` and `cmake --build` commands in these terminals.
+#### Sync Dependencies | 同步依赖
+```shell
+meson compile tidy
+```
 
-在 Windows 系统上使用 CMake，您需要安装一个兼容的工具，例如 Git Bash 或 Cygwin。安装完成后，您可以在这些终端中运行 `cmake` 和 `cmake --build` 命令。
+#### Build for Linux | 构建 Linux 版本
+```shell
+meson compile linux-build
+```
+
+#### Build for Windows | 构建 Windows 版本
+```shell
+meson compile windows-build
+```
+
+#### Clean Build Files | 清理构建文件
+```shell
+meson compile clean-target
+```
+
+Note: The build output will be in the `build/target` directory.
+注意：构建输出将位于 `build/target` 目录中。
 
 ## License | 许可证
 

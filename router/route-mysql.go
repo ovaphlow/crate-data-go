@@ -101,7 +101,7 @@ func (route *RouteMySQL) get(w http.ResponseWriter, r *http.Request) {
 	st := r.PathValue("st")
 	id := r.PathValue("id")
 
-	result, err := route.service.Get(st, [][]string{{"id='" + id + "'"}}, "")
+	result, err := route.service.Get(st, [][]string{{"equal", "id", id}}, "")
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
