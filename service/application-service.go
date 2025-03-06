@@ -11,7 +11,7 @@ import (
 
 // ApplicationService 定义了应用服务操作的接口。
 type ApplicationService interface {
-	Create(st string, d map[string]interface{}) error
+	Create(st string, d map[string]interface{}) (string, error)
 	Get(st string, f [][]string, l string) (map[string]interface{}, error)
 	Update(st string, d map[string]interface{}, w string, deprecated bool) error
 	Remove(st string, w string) error
@@ -34,12 +34,13 @@ func NewApplicationService(repo repository.RDBRepo) *ApplicationServiceImpl {
 //   - d: 应用服务数据。
 //
 // 返回值:
+//   - string: 创建的记录ID。
 //   - error: 如果创建失败，返回相应的错误。
-func (s *ApplicationServiceImpl) Create(st string, d map[string]interface{}) error {
+func (s *ApplicationServiceImpl) Create(st string, d map[string]any) (string, error) {
 	// id
 	id, err := utility.GenerateKsuid()
 	if err != nil {
-		return err
+		return "", err
 	}
 	d["id"] = id
 
@@ -51,14 +52,19 @@ func (s *ApplicationServiceImpl) Create(st string, d map[string]interface{}) err
 	// state
 	state := map[string]interface{}{
 		"created_at": time_string,
+		"status":     "active",
 	}
 	stateJson, err := json.Marshal(state)
 	if err != nil {
-		return err
+		return "", err
 	}
 	d["data_state"] = string(stateJson)
 
-	return s.repo.Create(st, d)
+	err = s.repo.Create(st, d)
+	if err != nil {
+		return "", err
+	}
+	return id, nil
 }
 
 // GetMany 获取多个应用服务记录。

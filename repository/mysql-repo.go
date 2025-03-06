@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func get_columns_mysql(db *sql.DB, st string) ([]string, error) {
@@ -59,16 +60,25 @@ func NewMySQLRepo(db *sql.DB) *MySQLRepoImpl {
 //
 // Returns:
 //   - error: error information
-func (r *MySQLRepoImpl) Create(st string, d map[string]interface{}) error {
+func (r *MySQLRepoImpl) Create(st string, d map[string]any) error {
 	columns, err := get_columns_mysql(r.db, st)
 	if err != nil {
 		return err
 	}
 
 	var placeholders []string
-	var values []interface{}
+	var values []any
 	for _, column := range columns {
 		if val, ok := d[column]; ok {
+			if str, isStr := val.(string); isStr && column == "event_time" {
+				if strings.Contains(str, "+") && strings.Contains(str, "-") && strings.Contains(str, ":") {
+					// 只对 event_time 字段进行时间格式转换
+					t, err := time.Parse("2006-01-02 15:04:05-0700", str)
+					if err == nil {
+						val = t.Format("2006-01-02 15:04:05")
+					}
+				}
+			}
 			placeholders = append(placeholders, "?")
 			values = append(values, val)
 		}

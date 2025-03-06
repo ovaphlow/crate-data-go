@@ -144,7 +144,7 @@ func (route *RouteMySQL) getMany(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 		return
 	}
-	if result == nil || len(result) == 0 {
+	if len(result) == 0 {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte("[]"))
 		return
@@ -157,7 +157,7 @@ func (route *RouteMySQL) post(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	st := r.PathValue("st")
 
-	var data map[string]interface{}
+	var data map[string]any
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
@@ -166,7 +166,7 @@ func (route *RouteMySQL) post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := route.service.Create(st, data)
+	id, err := route.service.Create(st, data)
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -176,6 +176,6 @@ func (route *RouteMySQL) post(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	response := schema.CreateHTTPResponseRFC9457("创建成功", http.StatusCreated, r)
+	response := schema.CreateHTTPResponseRFC9457(id, http.StatusCreated, r)
 	json.NewEncoder(w).Encode(response)
 }

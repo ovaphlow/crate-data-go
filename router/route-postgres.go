@@ -12,7 +12,7 @@ import (
 )
 
 func LoadPostgresRouter(mux *http.ServeMux, prefix string, service *service.ApplicationServiceImpl) {
-	route := &RouteMySQL{service: service}
+	route := &RoutePostgres{service: service}
 
 	mux.HandleFunc("DELETE "+prefix+"/postgres/{st}/{id}", func(w http.ResponseWriter, r *http.Request) {
 		route.delete(w, r)
@@ -161,7 +161,7 @@ func (route *RoutePostgres) post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := route.service.Create(st, data)
+	id, err := route.service.Create(st, data)
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -171,6 +171,6 @@ func (route *RoutePostgres) post(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	response := schema.CreateHTTPResponseRFC9457("创建成功", http.StatusCreated, r)
+	response := schema.CreateHTTPResponseRFC9457(id, http.StatusCreated, r)
 	json.NewEncoder(w).Encode(response)
 }
