@@ -1,0 +1,29 @@
+FROM docker.io/library/golang:1.24-alpine
+
+WORKDIR /app
+
+# Update Alpine package repositories to use USTC mirror
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories && \
+    apk update && \
+    apk add --no-cache git gcc musl-dev
+
+# Set environment variables
+ENV CGO_ENABLED=1
+ENV GOPROXY=https://goproxy.cn,direct
+ENV HTTP_PROXY=""
+ENV HTTPS_PROXY=""
+ENV http_proxy=""
+ENV https_proxy=""
+ENV no_proxy="*"
+
+# Copy go.mod and go.sum first for better caching
+COPY go.mod go.sum ./ 
+
+# Download dependencies
+RUN go mod download
+
+# Copy the rest of the source code
+COPY . .
+
+# Build and run
+CMD ["go", "run", "cmd/main.go"]

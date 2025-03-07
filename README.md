@@ -332,41 +332,7 @@ The API includes several security measures | API 包含多项安全措施：
 - API version middleware for version control | 用于版本控制的 API 版本中间件
 
 ## Build Instructions | 构建说明
-You can use either CMake or Meson to build this project.
-
-### Using CMake | 使用 CMake
-
-#### Initialize Build Directory | 初始化构建目录
-
-Create and initialize the `build` directory in the project root:
-
-在项目根目录下创建并初始化 `build` 目录：
-
-```shell
-mkdir -p build
-cd build
-cmake ..
-```
-
-#### Sync Dependencies | 同步依赖
-
-```shell
-cmake --build . --target tidy
-```
-
-#### Build Targets | 构建目标
-
-##### Build for Linux | 构建 Linux 版本
-
-```shell
-cmake --build . --target build-linux
-```
-
-#### Clean Build Files | 清理构建文件
-
-```shell
-cmake --build . --target clean_target
-```
+You can use Meson to build this project.
 
 ### Using Meson | 使用 Meson
 #### Initialize Build Directory | 初始化构建目录
