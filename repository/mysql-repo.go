@@ -10,31 +10,33 @@ import (
 	"time"
 )
 
-func get_columns_mysql(db *sql.DB, st string) ([]string, error) {
+func get_columns_mysql(db *sql.DB, st string) ([]string, map[string]string, error) {
 	slice := strings.Split(st, ".")
 	if len(slice) != 2 {
-		return nil, fmt.Errorf("参数错误 schema table")
+		return nil, nil, fmt.Errorf("参数错误 schema table")
 	}
 	query := `
-	select column_name
+	select column_name, data_type
 	from information_schema.columns
 	where table_schema = ? and table_name = ?
 	order by ordinal_position;
 	`
 	rows, err := db.Query(query, slice[0], slice[1])
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer rows.Close()
 	columns := []string{}
+	columnTypes := make(map[string]string)
 	for rows.Next() {
-		var name string
-		if err := rows.Scan(&name); err != nil {
-			return nil, err
+		var name, dataType string
+		if err := rows.Scan(&name, &dataType); err != nil {
+			return nil, nil, err
 		}
 		columns = append(columns, name)
+		columnTypes[name] = dataType
 	}
-	return columns, nil
+	return columns, columnTypes, nil
 }
 
 type MySQLRepoImpl struct {
@@ -61,7 +63,8 @@ func NewMySQLRepo(db *sql.DB) *MySQLRepoImpl {
 // Returns:
 //   - error: error information
 func (r *MySQLRepoImpl) Create(st string, d map[string]any) error {
-	columns, err := get_columns_mysql(r.db, st)
+	log.Printf("Data: %v\n", d)
+	columns, columnTypes, err := get_columns_mysql(r.db, st)
 	if err != nil {
 		return err
 	}
@@ -72,15 +75,44 @@ func (r *MySQLRepoImpl) Create(st string, d map[string]any) error {
 		if val, ok := d[column]; ok {
 			if str, isStr := val.(string); isStr && column == "event_time" {
 				if strings.Contains(str, "+") && strings.Contains(str, "-") && strings.Contains(str, ":") {
-					// 只对 event_time 字段进行时间格式转换
 					t, err := time.Parse("2006-01-02 15:04:05-0700", str)
 					if err == nil {
 						val = t.Format("2006-01-02 15:04:05")
 					}
 				}
 			}
-			placeholders = append(placeholders, "?")
-			values = append(values, val)
+
+			if columnTypes[column] == "json" {
+				switch v := val.(type) {
+				case map[string]any:
+					// Convert map to JSON string
+					keys := make([]string, 0, len(v))
+					jsonValues := make([]any, 0, len(v))
+					for k, mapVal := range v {
+						keys = append(keys, k)
+						jsonValues = append(jsonValues, mapVal)
+					}
+					placeholderPairs := make([]string, len(keys))
+					for i, key := range keys {
+						placeholderPairs[i] = fmt.Sprintf("'%s', ?", key)
+					}
+					placeholders = append(placeholders, fmt.Sprintf("JSON_OBJECT(%s)", strings.Join(placeholderPairs, ", ")))
+					values = append(values, jsonValues...)
+				case []any:
+					placeholderArr := make([]string, len(v))
+					for i := range v {
+						placeholderArr[i] = "?"
+					}
+					placeholders = append(placeholders, fmt.Sprintf("JSON_ARRAY(%s)", strings.Join(placeholderArr, ", ")))
+					values = append(values, v...)
+				default:
+					placeholders = append(placeholders, "CAST(? AS JSON)")
+					values = append(values, val)
+				}
+			} else {
+				placeholders = append(placeholders, "?")
+				values = append(values, val)
+			}
 		}
 	}
 
@@ -111,7 +143,7 @@ func (r *MySQLRepoImpl) Create(st string, d map[string]any) error {
 func (r *MySQLRepoImpl) Get(st string, c []string, f [][]string, l string) ([]map[string]interface{}, error) {
 	if len(c) == 0 {
 		var err error
-		c, err = get_columns_mysql(r.db, st)
+		c, _, err = get_columns_mysql(r.db, st)
 		if err != nil {
 			log.Println(err.Error())
 			return nil, err
@@ -242,7 +274,7 @@ func (r *MySQLRepoImpl) Get(st string, c []string, f [][]string, l string) ([]ma
 // Returns:
 //   - error: error information
 func (r *MySQLRepoImpl) Update(st string, d map[string]interface{}, w string) error {
-	columns, err := get_columns_mysql(r.db, st)
+	columns, _, err := get_columns_mysql(r.db, st)
 	if err != nil {
 		return err
 	}

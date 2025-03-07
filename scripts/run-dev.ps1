@@ -13,17 +13,24 @@ if ($existingContainers) {
     }
 }
 
-# 删除旧的镜像（如果存在）
+Write-Host "Removing old image..." -ForegroundColor Yellow
+# 删除旧的镜像（在容器被删除后）
 podman rmi $imageTag 2>$null
 
+Write-Host ""
 # 构建新的镜像
 Write-Host "Building new image..." -ForegroundColor Green
 podman build --no-cache -t $imageTag -f Dockerfile.dev .
 
+Write-Host ""
 # 运行新的容器
 Write-Host "Starting container in background..." -ForegroundColor Green
 podman run -d --name $containerName -p 8421:8421 -v ${PWD}:/app $imageTag
 
+Write-Host ""
 # 显示容器状态
-Write-Host "Container status:" -ForegroundColor Green
-podman ps --filter name=$containerName
+podman ps -a
+
+Write-Host ""
+Write-Host "Container logs:" -ForegroundColor Green
+podman logs -f $containerName
