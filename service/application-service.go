@@ -44,7 +44,7 @@ func (s *ApplicationServiceImpl) Create(st string, d map[string]any) (string, er
 	}
 	d["id"] = id
 
-	time_string := time.Now().Format("2006-01-02 15:04:05-0700")
+	time_string := time.Now().Format("2006-01-02 15:04:05")
 
 	// time
 	d["event_time"] = time_string
@@ -138,7 +138,8 @@ func (s *ApplicationServiceImpl) Update(st string, d map[string]interface{}, w s
 	if err != nil {
 		return err
 	}
-	state["updated_at"] = time.Now().Format("2006-01-02 15:04:05-0700")
+
+	state["updated_at"] = time.Now().Format("2006-01-02 15:04:05")
 	if deprecated {
 		state["deprecated"] = true
 	}

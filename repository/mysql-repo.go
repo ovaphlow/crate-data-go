@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"reflect"
@@ -75,7 +76,7 @@ func (r *MySQLRepoImpl) Create(st string, d map[string]any) error {
 		if val, ok := d[column]; ok {
 			if str, isStr := val.(string); isStr && column == "event_time" {
 				if strings.Contains(str, "+") && strings.Contains(str, "-") && strings.Contains(str, ":") {
-					t, err := time.Parse("2006-01-02 15:04:05-0700", str)
+					t, err := time.Parse("2006-01-02 15:04:05", str)
 					if err == nil {
 						val = t.Format("2006-01-02 15:04:05")
 					}
@@ -84,27 +85,13 @@ func (r *MySQLRepoImpl) Create(st string, d map[string]any) error {
 
 			if columnTypes[column] == "json" {
 				switch v := val.(type) {
-				case map[string]any:
-					// Convert map to JSON string
-					keys := make([]string, 0, len(v))
-					jsonValues := make([]any, 0, len(v))
-					for k, mapVal := range v {
-						keys = append(keys, k)
-						jsonValues = append(jsonValues, mapVal)
+				case map[string]any, []any:
+					jsonStr, err := json.Marshal(v)
+					if err != nil {
+						return err
 					}
-					placeholderPairs := make([]string, len(keys))
-					for i, key := range keys {
-						placeholderPairs[i] = fmt.Sprintf("'%s', ?", key)
-					}
-					placeholders = append(placeholders, fmt.Sprintf("JSON_OBJECT(%s)", strings.Join(placeholderPairs, ", ")))
-					values = append(values, jsonValues...)
-				case []any:
-					placeholderArr := make([]string, len(v))
-					for i := range v {
-						placeholderArr[i] = "?"
-					}
-					placeholders = append(placeholders, fmt.Sprintf("JSON_ARRAY(%s)", strings.Join(placeholderArr, ", ")))
-					values = append(values, v...)
+					placeholders = append(placeholders, "CAST(? AS JSON)")
+					values = append(values, string(jsonStr))
 				default:
 					placeholders = append(placeholders, "CAST(? AS JSON)")
 					values = append(values, val)

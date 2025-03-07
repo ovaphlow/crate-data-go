@@ -8,13 +8,24 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	_ "time/tzdata" // 引入时区数据
 )
 
 var MySQL *sql.DB
 
+func init() {
+	// 确保time包加载了时区数据
+	loc, err := time.LoadLocation("Asia/Shanghai")
+	if err != nil {
+		log.Printf("Warning: Failed to load Asia/Shanghai timezone: %v", err)
+	} else {
+		time.Local = loc
+	}
+}
+
 func InitMySQL(user, password, host, port, database string) {
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		"%s:%s@tcp(%s:%s)/%s?parseTime=true&time_zone=%%27%%2B08:00%%27",
 		user,
 		password,
 		host,
