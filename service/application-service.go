@@ -50,7 +50,7 @@ func (s *ApplicationServiceImpl) Create(st string, d map[string]any) (string, er
 	d["event_time"] = time_string
 
 	// state
-	state := map[string]interface{}{
+	state := map[string]any{
 		"created_at": time_string,
 		"status":     "active",
 	}

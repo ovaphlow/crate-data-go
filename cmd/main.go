@@ -75,7 +75,12 @@ func main() {
 	mux := http.NewServeMux()
 
 	// 应用多个中间件到 mux
-	handler := applyMiddlewares(mux, middleware.APIVersionMiddleware, middleware.CORSMiddleware, middleware.SecurityHeadersMiddleware)
+	handler := applyMiddlewares(mux,
+		middleware.LogRequest, // 添加请求日志中间件
+		middleware.APIVersionMiddleware,
+		middleware.CORSMiddleware,
+		middleware.SecurityHeadersMiddleware,
+	)
 	log.Println("中间件已加载")
 
 	// 加载 PostgreSQL 路由

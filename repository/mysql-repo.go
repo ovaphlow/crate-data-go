@@ -85,6 +85,8 @@ func (r *MySQLRepoImpl) Create(st string, d map[string]any) error {
 	}
 
 	q := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", st, strings.Join(columns, ", "), strings.Join(placeholders, ", "))
+	log.Printf("Query: %s\n", q)
+	log.Printf("Values: %v\n", values)
 	stmt, err := r.db.Prepare(q)
 	if err != nil {
 		return err
