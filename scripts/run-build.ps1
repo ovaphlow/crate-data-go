@@ -37,7 +37,7 @@ New-Item -ItemType Directory -Force -Path "build-target"
 Write-Host "从容器中复制编译好的程序..." -ForegroundColor Green
 
 # 从容器中复制编译好的程序到本地build-target目录
-podman cp "${ContainerName}:/app/build-target/crate-api-data-linux" "build-target/"
+podman cp "${ContainerName}:/app/build-target/crate-api-data" "build-target/"
 podman cp "${ContainerName}:/app/build-target/crate-api-data.exe" "build-target/"
 Copy-Item ".env" "build-target/" -ErrorAction SilentlyContinue
 
