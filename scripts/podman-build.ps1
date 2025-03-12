@@ -1,5 +1,3 @@
-$ErrorActionPreference = "Stop"
-
 # 设置容器名称和镜像名称
 $containerName = "crate-data-build"
 $imageName = "docker.io/library/golang:1.24-alpine"
@@ -22,18 +20,13 @@ podman run --rm --name $containerName `
     -e HTTPS_PROXY="" `
     -e http_proxy="" `
     -e https_proxy="" `
-    $imageName /bin/sh -c "sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories && apk update && apk add --no-cache mingw-w64-gcc && cd /app && go mod download && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags='-s -w' -o build-target/crate-api-data cmd/main.go && CGO_ENABLED=0 GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ go build -trimpath -ldflags='-s -w' -o build-target/crate-api-data.exe cmd/main.go"
+    $imageName /bin/sh -c "sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories && apk update && apk add --no-cache mingw-w64-gcc build-base && cd /app && go mod download && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags='-s -w' -o build-target/crate-api-data cmd/main.go && CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ go build -trimpath -ldflags='-s -w' -o build-target/crate-api-data.exe cmd/main.go"
 
 # 复制配置文件
 Write-Host "Copying configuration files..." -ForegroundColor Green
 if (Test-Path ".env") {
     Copy-Item -Path ".env" -Destination "build-target/"
 }
-
-# 删除构建容器
-Write-Host "Cleaning up containers..." -ForegroundColor Yellow
-podman stop $containerName 2>$null
-podman rm $containerName 2>$null
 
 Write-Host "Build completed!" -ForegroundColor Cyan
 Write-Host "Output files are in the ./build-target directory"
