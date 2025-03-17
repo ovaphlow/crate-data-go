@@ -341,11 +341,6 @@ meson setup build
 cd build
 ```
 
-#### Sync Dependencies | 同步依赖
-```shell
-meson compile tidy
-```
-
 #### Build for Linux | 构建 Linux 版本
 ```shell
 meson compile linux-build

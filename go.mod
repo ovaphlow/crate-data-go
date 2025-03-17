@@ -10,3 +10,6 @@ require (
 )
 
 require filippo.io/edwards25519 v1.1.0 // indirect
+
+// Set GOPROXY for this module
+// replace command: go env -w GOPROXY=https://goproxy.cn,direct
