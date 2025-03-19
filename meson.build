@@ -41,3 +41,12 @@ windows_build = custom_target('windows-build',
   build_by_default: false,
   build_always_stale: true
 )
+
+# Build target for both platforms
+build = custom_target('build_all',
+  output: ['crate-api-data_x64', 'crate-api-data_x64.exe'],
+  command: ['echo', 'Building both Linux and Windows targets...'],
+  depends: [linux_build, windows_build],
+  build_by_default: false,
+  build_always_stale: true
+)
