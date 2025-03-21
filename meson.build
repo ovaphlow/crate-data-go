@@ -19,23 +19,23 @@ clean_target = custom_target('clean_target',
 )
 
 # Linux build target
-linux_build = custom_target('linux-build',
+linux_build = custom_target('linux_build',
   output: 'crate-api-data',
   command: [
     'sh', '-c',
     'cd "' + source_dir + '" && GOPROXY=https://goproxy.cn,direct CGO_ENABLED=1 ' + go.path() + ' build -ldflags "-s -w" -trimpath -o "' + output_dir + '/crate-api-data" cmd/main.go && cp .env "' + output_dir + '/"'
   ],
   depends: clean_target,
-  build_by_default: true,
+  build_by_default: false,
   build_always_stale: true
 )
 
 # Windows build target
-windows_build = custom_target('windows-build',
+windows_build = custom_target('windows_build',
   output: 'crate-api-data.exe',
   command: [
     'sh', '-c',
-    'cd "' + source_dir + '" && GOPROXY=https://goproxy.cn,direct CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ ' + go.path() + ' build -ldflags "-s -w" -trimpath -o "' + output_dir + '/crate-api-data.exe" cmd/main.go && cp .env "' + output_dir + '/"'
+    'cd "' + source_dir + '" && GOPROXY=https://goproxy.cn,direct CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ ' + go.path() + ' build -ldflags "-s -w" -trimpath -o "' + output_dir + '/crate-api-data_mingw.exe" cmd/main.go'
   ],
   depends: clean_target,
   build_by_default: false,
@@ -44,9 +44,9 @@ windows_build = custom_target('windows-build',
 
 # Build target for both platforms
 build = custom_target('build_all',
-  output: ['crate-api-data_x64', 'crate-api-data_x64.exe'],
-  command: ['echo', 'Building both Linux and Windows targets...'],
+  output: ['crate-api-data_linux', 'crate-api-data_win.exe'],
+  command: ['true'],
   depends: [linux_build, windows_build],
-  build_by_default: false,
+  build_by_default: true,
   build_always_stale: true
 )
