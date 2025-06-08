@@ -77,7 +77,7 @@ meson compile -C build
 ```
 
 ```bash
-./build/target/crate-api-data
+./crate-api-data
 ```
 
 ## Database Schema | 数据库表结构
