@@ -67,9 +67,13 @@ SQLITE_DATABASE=./data.db  # SQLite database file path | SQLite 数据库文件�
 ```
 
 3. Build and run the application | 构建并运行应用：
+
 ```bash
-go build -o crate-api-data cmd/main.go
-./crate-api-data
+meson compile -C build
+```
+
+```bash
+./build/target/crate-api-data
 ```
 
 ## Database Schema | 数据库表结构
