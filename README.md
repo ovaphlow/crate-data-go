@@ -69,6 +69,10 @@ SQLITE_DATABASE=./data.db  # SQLite database file path | SQLite 数据库文件�
 3. Build and run the application | 构建并运行应用：
 
 ```bash
+# 初始化
+meson setup build
+
+# 构建
 meson compile -C build
 ```
 
