@@ -35,7 +35,7 @@ windows_build = custom_target('windows_build',
   output: 'crate-api-data.exe',
   command: [
     'sh', '-c',
-    'cd "' + source_dir + '" && GOPROXY=https://goproxy.cn,direct CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ ' + go.path() + ' build -ldflags "-s -w" -trimpath -o "' + output_dir + '/crate-api-data_mingw.exe" cmd/main.go'
+    'cd "' + source_dir + '" && GOPROXY=https://goproxy.cn,direct CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ ' + go.path() + ' build -ldflags "-s -w" -trimpath -o "' + output_dir + '/crate-api-data_mingw32.exe" cmd/main.go'
   ],
   depends: clean_target,
   build_by_default: false,

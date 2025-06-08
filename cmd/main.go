@@ -107,6 +107,13 @@ func main() {
 		router.LoadSQLiteRouter(mux, "/crate-api-data", sqliteService)
 	}
 
+	// 添加健康检查端点
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"ok","service":"crate-service"}`))
+	})
+
 	// 获取端口号并启动 HTTP 服务器
 	port := os.Getenv("PORT")
 	if port == "" {
