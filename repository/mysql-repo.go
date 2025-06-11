@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"ovaphlow.com/crate/data/utility"
 )
 
 func get_columns_mysql(db *sql.DB, st string) ([]string, map[string]string, error) {
@@ -64,7 +66,7 @@ func NewMySQLRepo(db *sql.DB) *MySQLRepoImpl {
 // Returns:
 //   - error: error information
 func (r *MySQLRepoImpl) Create(st string, d map[string]any) error {
-	log.Printf("Data: %v\n", d)
+	utility.ZapLogger.Info(fmt.Sprintf("Data: %v\n", d))
 	columns, columnTypes, err := get_columns_mysql(r.db, st)
 	if err != nil {
 		return err
@@ -104,8 +106,8 @@ func (r *MySQLRepoImpl) Create(st string, d map[string]any) error {
 	}
 
 	q := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", st, strings.Join(columns, ", "), strings.Join(placeholders, ", "))
-	log.Printf("Query: %s\n", q)
-	log.Printf("Values: %v\n", values)
+	utility.ZapLogger.Info(fmt.Sprintf("Query: %s\n", q))
+	utility.ZapLogger.Info(fmt.Sprintf("Values: %v\n", values))
 	stmt, err := r.db.Prepare(q)
 	if err != nil {
 		return err
@@ -199,14 +201,14 @@ func (r *MySQLRepoImpl) Get(st string, c []string, f [][]string, l string) ([]ma
 		q += " " + l
 	}
 
-	log.Println(q)
+	utility.ZapLogger.Info(q)
 	stmt, err := r.db.Prepare(q)
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
-	log.Println(params)
+	utility.ZapLogger.Info(fmt.Sprintf("Params: %v\n", params))
 	rows, err := stmt.Query(params...)
 	if err != nil {
 		return nil, err

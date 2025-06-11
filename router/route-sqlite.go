@@ -2,10 +2,10 @@ package router
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strings"
 
+	"go.uber.org/zap"
 	"ovaphlow.com/crate/data/schema"
 	"ovaphlow.com/crate/data/service"
 	"ovaphlow.com/crate/data/utility"
@@ -47,7 +47,7 @@ func (route RouteSQLite) delete(w http.ResponseWriter, r *http.Request) {
 
 	err := route.service.Remove(st, "id='"+id+"'")
 	if err != nil {
-		log.Println(err.Error())
+		utility.ZapLogger.Error("删除失败", zap.Error(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		response := schema.CreateHTTPResponseRFC9457("删除失败", http.StatusInternalServerError, r)
 		json.NewEncoder(w).Encode(response)
@@ -68,7 +68,7 @@ func (route RouteSQLite) put(w http.ResponseWriter, r *http.Request) {
 
 	var data map[string]interface{}
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		log.Println(err.Error())
+		utility.ZapLogger.Error("无效的请求体", zap.Error(err))
 		w.WriteHeader(http.StatusBadRequest)
 		response := schema.CreateHTTPResponseRFC9457("无效的请求体", http.StatusBadRequest, r)
 		json.NewEncoder(w).Encode(response)
@@ -82,7 +82,7 @@ func (route RouteSQLite) put(w http.ResponseWriter, r *http.Request) {
 	}
 	err := route.service.Update(st, data, "id='"+id+"'", deprecated)
 	if err != nil {
-		log.Println(err.Error())
+		utility.ZapLogger.Error("更新失败", zap.Error(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		response := schema.CreateHTTPResponseRFC9457("更新失败", http.StatusInternalServerError, r)
 		json.NewEncoder(w).Encode(response)
@@ -102,7 +102,7 @@ func (route RouteSQLite) get(w http.ResponseWriter, r *http.Request) {
 	filter := r.URL.Query().Get("f")
 	f, err := utility.ConvertQueryStringToDefaultFilter(filter)
 	if err != nil {
-		log.Println(err.Error())
+		utility.ZapLogger.Error("无效的查询参数", zap.Error(err))
 		w.WriteHeader(http.StatusBadRequest)
 		response := schema.CreateHTTPResponseRFC9457("无效的查询参数", http.StatusBadRequest, r)
 		json.NewEncoder(w).Encode(response)
@@ -111,7 +111,7 @@ func (route RouteSQLite) get(w http.ResponseWriter, r *http.Request) {
 
 	result, err := route.service.Get(st, f, last)
 	if err != nil {
-		log.Println(err.Error())
+		utility.ZapLogger.Error("内部服务器错误", zap.Error(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		response := schema.CreateHTTPResponseRFC9457("内部服务器错误", http.StatusInternalServerError, r)
 		json.NewEncoder(w).Encode(response)
@@ -129,7 +129,7 @@ func (route RouteSQLite) getMany(w http.ResponseWriter, r *http.Request) {
 	filter := r.URL.Query().Get("f")
 	f, err := utility.ConvertQueryStringToDefaultFilter(filter)
 	if err != nil {
-		log.Println(err.Error())
+		utility.ZapLogger.Error("无效的查询参数", zap.Error(err))
 		w.WriteHeader(http.StatusBadRequest)
 		response := schema.CreateHTTPResponseRFC9457("无效的查询参数", http.StatusBadRequest, r)
 		json.NewEncoder(w).Encode(response)
@@ -145,7 +145,7 @@ func (route RouteSQLite) getMany(w http.ResponseWriter, r *http.Request) {
 
 	result, err := route.service.GetMany(st, c, f, last)
 	if err != nil {
-		log.Println(err.Error())
+		utility.ZapLogger.Error("内部服务器错误", zap.Error(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		response := schema.CreateHTTPResponseRFC9457("内部服务器错误", http.StatusInternalServerError, r)
 		json.NewEncoder(w).Encode(response)
@@ -161,7 +161,7 @@ func (route RouteSQLite) post(w http.ResponseWriter, r *http.Request) {
 
 	var data map[string]interface{}
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		log.Println(err.Error())
+		utility.ZapLogger.Error("无效的请求体", zap.Error(err))
 		w.WriteHeader(http.StatusBadRequest)
 		response := schema.CreateHTTPResponseRFC9457("无效的请求体", http.StatusBadRequest, r)
 		json.NewEncoder(w).Encode(response)
@@ -170,7 +170,7 @@ func (route RouteSQLite) post(w http.ResponseWriter, r *http.Request) {
 
 	id, err := route.service.Create(st, data)
 	if err != nil {
-		log.Println(err.Error())
+		utility.ZapLogger.Error("创建失败", zap.Error(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		response := schema.CreateHTTPResponseRFC9457("创建失败", http.StatusInternalServerError, r)
 		json.NewEncoder(w).Encode(response)

@@ -3,10 +3,11 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"ovaphlow.com/crate/data/utility"
 )
 
 // get_columns_postgres retrieves column names for a given schema and table.
@@ -271,14 +272,14 @@ func (r *PostgresRepoImpl) Update(st string, d map[string]interface{}, w string)
 	q += strings.Join(values, ", ")
 	q += " where " + w
 
-	log.Println(q)
+	utility.ZapLogger.Info(q)
 	stmt, err := r.db.Prepare(q)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	log.Println(p)
+	utility.ZapLogger.Info(fmt.Sprintf("Params: %v\n", p))
 	_, err = stmt.Exec(p...)
 	if err != nil {
 		return err

@@ -98,13 +98,13 @@ func (s *ApplicationServiceImpl) GetMany(st string, c []string, f [][]string, l 
 // 返回值:
 //   - map[string]interface{}: 应用服务数据。
 //   - error: 如果获取失败，返回相应的错误。
-func (s *ApplicationServiceImpl) Get(st string, f [][]string, l string) (map[string]interface{}, error) {
+func (s *ApplicationServiceImpl) Get(st string, f [][]string, l string) (map[string]any, error) {
 	data, err := s.repo.Get(st, nil, f, l+" limit 1")
 	if err != nil {
 		return nil, err
 	}
 	if len(data) == 0 {
-		return map[string]interface{}{}, fmt.Errorf("记录不存在")
+		return map[string]any{}, fmt.Errorf("记录不存在")
 	}
 	return data[0], nil
 }
@@ -119,7 +119,7 @@ func (s *ApplicationServiceImpl) Get(st string, f [][]string, l string) (map[str
 //
 // 返回值:
 //   - error: 如果更新失败，返回相应的错误。
-func (s *ApplicationServiceImpl) Update(st string, d map[string]interface{}, w string, deprecated bool) error {
+func (s *ApplicationServiceImpl) Update(st string, d map[string]any, w string, deprecated bool) error {
 	id, ok := d["id"].(string)
 	if !ok {
 		return fmt.Errorf("缺少ID")
@@ -133,7 +133,7 @@ func (s *ApplicationServiceImpl) Update(st string, d map[string]interface{}, w s
 		return fmt.Errorf("记录不存在")
 	}
 
-	var state map[string]interface{}
+	var state map[string]any
 	err = json.Unmarshal([]byte(existingData[0]["data_state"].(string)), &state)
 	if err != nil {
 		return err

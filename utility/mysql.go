@@ -3,21 +3,21 @@ package utility
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"runtime"
 	"time"
 
+	_ "time/tzdata"
+
 	_ "github.com/go-sql-driver/mysql"
-	_ "time/tzdata" // 引入时区数据
+	"go.uber.org/zap"
 )
 
 var MySQL *sql.DB
 
 func init() {
-	// 确保time包加载了时区数据
 	loc, err := time.LoadLocation("Asia/Shanghai")
 	if err != nil {
-		log.Printf("Warning: Failed to load Asia/Shanghai timezone: %v", err)
+		ZapLogger.Warn("Failed to load Asia/Shanghai timezone", zap.Error(err))
 	} else {
 		time.Local = loc
 	}
@@ -35,7 +35,7 @@ func InitMySQL(user, password, host, port, database string) {
 	var err error
 	MySQL, err = sql.Open("mysql", dsn)
 	if err != nil {
-		log.Fatal(err.Error())
+		ZapLogger.Fatal(err.Error())
 	}
 	MySQL.SetConnMaxLifetime(time.Minute * 3)
 	cpuCount := runtime.NumCPU()
@@ -44,8 +44,7 @@ func InitMySQL(user, password, host, port, database string) {
 	MySQL.SetMaxIdleConns(0)
 	MySQL.SetConnMaxLifetime(time.Second * 30)
 	if err = MySQL.Ping(); err != nil {
-		log.Println("连接数据库失败 MySQL")
-		log.Fatal(err.Error())
+		ZapLogger.Fatal("连接数据库失败 MySQL", zap.Error(err))
 	}
-	log.Println("连接数据库成功 MySQL")
+	ZapLogger.Info("连接数据库成功 MySQL")
 }

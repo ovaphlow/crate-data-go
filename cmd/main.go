@@ -2,7 +2,6 @@ package main
 
 // 导入必要的包
 import (
-	"log"
 	"net/http"
 	"os"
 
@@ -13,17 +12,18 @@ import (
 	"ovaphlow.com/crate/data/utility"
 
 	"github.com/joho/godotenv"
+	"go.uber.org/zap"
 )
 
 func init() {
 	// 加载环境变量文件
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		panic("Error loading .env file")
 	}
 
-	// 初始化结构化日志
-	utility.InitSlog()
+	// 初始化 Zap 日志器
+	utility.InitZapLogger()
 
 	// 初始化 PostgreSQL 数据库
 	postgres_enabled := os.Getenv("POSTGRES_ENABLED")
@@ -81,7 +81,7 @@ func main() {
 		middleware.CORSMiddleware,
 		middleware.SecurityHeadersMiddleware,
 	)
-	log.Println("中间件已加载")
+	utility.ZapLogger.Info("中间件已加载")
 
 	// 加载 PostgreSQL 路由
 	postgres_enabled := os.Getenv("POSTGRES_ENABLED")
@@ -119,6 +119,6 @@ func main() {
 	if port == "" {
 		port = "8421"
 	}
-	log.Println("0.0.0.0:" + port)
-	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, handler))
+	utility.ZapLogger.Info("服务器启动", zap.String("address", "0.0.0.0:"+port))
+	panic(http.ListenAndServe("0.0.0.0:"+port, handler))
 }

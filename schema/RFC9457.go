@@ -11,7 +11,7 @@ import "net/http"
 //
 // 返回:
 //   - map[string]interface{}: HTTP响应的映射。
-func CreateHTTPResponseRFC9457(title string, status int, r *http.Request) map[string]interface{} {
+func CreateHTTPResponseRFC9457(title string, status int, r *http.Request) map[string]any {
 	return map[string]interface{}{
 		"type":     "about:blank",
 		"title":    title,

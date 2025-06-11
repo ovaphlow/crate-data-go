@@ -3,8 +3,11 @@ package middleware
 import (
 	"bytes"
 	"io"
-	"log"
 	"net/http"
+
+	"ovaphlow.com/crate/data/utility"
+
+	"go.uber.org/zap"
 )
 
 func LogRequest(next http.Handler) http.Handler {
@@ -22,10 +25,16 @@ func LogRequest(next http.Handler) http.Handler {
 				r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 			}
 
-			log.Printf("%s %s\n", method, url)
-			log.Printf("Request Body: %s", string(bodyBytes))
+			utility.ZapLogger.Info("HTTP Request",
+				zap.String("method", method),
+				zap.String("url", url),
+				zap.String("body", string(bodyBytes)),
+			)
 		} else {
-			log.Printf("%s %s \n", method, url)
+			utility.ZapLogger.Info("HTTP Request",
+				zap.String("method", method),
+				zap.String("url", url),
+			)
 		}
 
 		next.ServeHTTP(w, r)
