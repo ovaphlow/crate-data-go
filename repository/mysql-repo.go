@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"reflect"
 	"strconv"
 	"strings"
@@ -134,7 +133,7 @@ func (r *MySQLRepoImpl) Get(st string, c []string, f [][]string, l string) ([]ma
 		var err error
 		c, _, err = get_columns_mysql(r.db, st)
 		if err != nil {
-			log.Println(err.Error())
+			utility.ZapLogger.Error(fmt.Sprintf("Error getting columns for %s: %s", st, err.Error()))
 			return nil, err
 		}
 	}
@@ -186,7 +185,7 @@ func (r *MySQLRepoImpl) Get(st string, c []string, f [][]string, l string) ([]ma
 			whereClauses = append(whereClauses, fmt.Sprintf("%s <= ?", field))
 			params = append(params, condition[2])
 		case "json-array-contains":
-			whereClauses = append(whereClauses, fmt.Sprintf("JSON_CONTAINS(%s, '\"%s\"')", field, condition[2]))
+			whereClauses = append(whereClauses, fmt.Sprintf("JSON_CONTAINS(%s, JSON_ARRAY('%s'))", field, condition[2]))
 		case "json-object-contains":
 			whereClauses = append(whereClauses, fmt.Sprintf("JSON_CONTAINS(%s, ?, '$')", field))
 			params = append(params, fmt.Sprintf(`{"%s": "%s"}`, condition[2], condition[3]))
