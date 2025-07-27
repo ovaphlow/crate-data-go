@@ -1,0 +1,9 @@
+services:
+  crate-data:
+    build: .
+    ports:
+      - "8421:8421"
+    volumes:
+      - ./logs:/app/logs:z
+    environment:
+      - TZ=Asia/Shanghai

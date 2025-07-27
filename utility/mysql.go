@@ -25,7 +25,7 @@ func init() {
 
 func InitMySQL(user, password, host, port, database string) {
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?parseTime=true&time_zone=%%27%%2B08:00%%27",
+		"%s:%s@tcp(%s:%s)/%s?parseTime=true&loc=Local&charset=utf8mb4&timeout=5s&readTimeout=5s&writeTimeout=5s",
 		user,
 		password,
 		host,
