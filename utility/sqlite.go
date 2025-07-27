@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
+	_ "modernc.org/sqlite"
 )
 
 var SQLite *sql.DB
@@ -25,7 +25,7 @@ func InitSQLite() {
 		ZapLogger.Fatal("环境变量未设置 SQLite", zap.Error(errors.New("环境变量未设置 SQLite")))
 	}
 
-	SQLite, err = sql.Open("sqlite3", dsn+"?_journal_mode=WAL&_cache=shared&_synchronous=NORMAL&_temp_store=MEMORY&_auto_vacuum=INCREMENTAL")
+	SQLite, err = sql.Open("sqlite", dsn+"?_journal_mode=WAL&_cache=shared&_synchronous=NORMAL&_temp_store=MEMORY&_auto_vacuum=INCREMENTAL")
 	if err != nil {
 		ZapLogger.Fatal("Failed to open SQLite connection", zap.Error(err))
 	}
