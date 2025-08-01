@@ -1,6 +1,7 @@
 services:
   crate-data:
     build: .
+    container_name: crate-data-container
     ports:
       - "8421:8421"
     volumes:
